@@ -13,7 +13,7 @@ router.post('/signup', userControl.userRegistration);
 
 router.get('/verify/:id/:code', userControl.verificateEmailToken);
 
-router.get('/login', userControl.userLogin);
+router.post('/login', userControl.userLogin);
 
 router.get('/current', checkUser, userControl.getInfoCurrentUser);
 
