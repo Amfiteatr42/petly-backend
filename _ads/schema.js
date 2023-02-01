@@ -3,7 +3,16 @@ const mongoose = require('mongoose');
 const adSchema = new mongoose.Schema({
   _id: Number,
   categoryId: Number,
-  imgURL: String,
+   imgURL: {
+    url: {
+      type: String,
+      default: '',
+    },
+    publicId: {
+      type: String,
+      default: '',
+    }
+  }, 
   userId: {
     type: String,
     required: true,

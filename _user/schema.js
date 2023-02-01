@@ -7,8 +7,15 @@ const userSchema = new mongoose.Schema({
     unique: true,
   },
   avatarURL: {
+    url: {
       type: String,
       default: '',
+    },
+    publicId: {
+      type: String,
+      default: '',
+    }
+      
     },
    email: {
     type: String,

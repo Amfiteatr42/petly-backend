@@ -1,16 +1,15 @@
 const mongoose = require('mongoose');
 const Joi = require('joi');
 const fs = require('fs/promises');
-const path = require('path');
-const sgMail = require('@sendgrid/mail');
-
 const { userSchema } = require("./schema.js");
 const User = mongoose.model("User", userSchema);
 
 const { hashPassword, comparePasswords } = require('../Helpers/password.js');
 const { generateToken } = require('../Helpers/token.js');
 
-const {getNewID} = require ('../Helpers/newID.js')
+const {getNewID} = require ('../Helpers/newID.js');
+const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
+
 
 
 function makeValidate(req, res) {
@@ -38,6 +37,7 @@ function makeValidate(req, res) {
 }
 
 async function userRegistration(req, res) {
+    console.log("===========================================================", req);
     if (!makeValidate(req, res)) return;
     const { email, password, userName, city, phone } = req.body;
     console.log( email, password, userName, city, phone );
@@ -137,7 +137,7 @@ async function userLogin(req, res) {
         const token = await generateToken({ id: user._id });
         const longToken = await generateToken({ id: user._id });
         await User.findByIdAndUpdate(user._id, { $set: { longToken } })
-            .select(['_id', 'email', 'userName', 'city', 'phone'])
+            .select(['_id', 'email', 'userName', 'city', 'phone', 'avatarURL.url'])
             .exec((err, user) => {
                 if (err) res.status(500).json({"message": err});
                 res.json({
@@ -198,7 +198,7 @@ async function refreshUser(req, res) {
     const id = req.user.id; 
     const user = await User.findById(id);
     if (user === null) {
-            res.status(400).json({ "message": `user not found with id: ${id}` });
+            res.status(400).json({ message: `user not found with id: ${id}` });
             return;
     }
     if (user.longToken === "") {
@@ -265,7 +265,35 @@ async function updateAvatar(req, res) {
         await fs.unlink(req.file.path);         
     }    
 }
+async function patchAvatar(req, res) {
+    const _id = req.user.id; 
+    const user = await User.findById(_id);
+    if (!user) {
+        res.status(400).json({ message: `user not found with id: ${id}` });
+        return;
+    }
 
+    const result = await uploadCLD(req.file.path);
+    console.log("upload   result   ", result);
+    
+    if (!user.avatarURL.publicId) {
+        await removeCLD(user.avatarURL.publicId);
+    }
+    user.avatarURL.url = result.url;
+    user.avatarURL.publicId = result.public_id;
+    user.save((err, user) => {
+        if (err) {
+          res.status(500).json({ message: "Error occurred", "err": err });
+          return;
+        }
+        res.json({
+        message: "Aavatar update",
+        data: { avatarURL: user.avatarURL},
+        });
+    })
+
+    
+}
 async function setFavoriteAds(req, res) {
     const _id = req.user.id; 
     const adId = req.params.id;
@@ -307,6 +335,7 @@ module.exports = {
     updateUser,
     refreshUser,
     updateAvatar,
+    patchAvatar,
     setFavoriteAds,
     removeFavoriteAds,
 };

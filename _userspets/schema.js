@@ -3,8 +3,14 @@ const mongoose = require('mongoose');
 const userPetSchema = new mongoose.Schema({ 
   _id: Number,
   imgURL: {
-    type: String,
-    default: '',
+    url: {
+      type: String,
+      default: '',
+    },
+    publicId: {
+      type: String,
+      default: '',
+    }
   },   
   name: {
     type: String,
