@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "version": "1.0.0",
+    "version": "1.1.0",
     "title": "Pets Support",
     "description": "Backend documentation",
     "license": {
@@ -12,8 +12,8 @@
   "consumes": ["application/json", "multipart/form-data"],
   "produces": ["application/json"],
   "servers": [
-    { "url": "http://localhost:3333/api" },
-    { "url": "https://api-petly.onrender.com/api" }
+    { "url": "https://api-petly.onrender.com/api" },
+    { "url": "http://localhost:3333/api" }
   ],
   "tags": [
     {
@@ -76,50 +76,8 @@
         }
       }
     },
-    "/users/verify/": {
-      "get": {
-        "tags": ["Auth"],
-        "summary": "User verification",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "type": "string",
-            "description": "User verification email token"
-          },
-          {
-            "in": "path",
-            "name": "code",
-            "required": true,
-            "type": "string",
-            "description": "User code from the email"
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerificationResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request (invalid request body)",
-            "content": {}
-          },
-          "409": {
-            "description": "Provided email already exists",
-            "content": {}
-          }
-        }
-      }
-    },
     "/users/login": {
-      "get": {
+      "post": {
         "tags": ["Auth"],
         "summary": "User login",
         "parameters": [],
@@ -154,7 +112,7 @@
     },
     "/users/current": {
       "get": {
-        "tags": ["Auth"],
+        "tags": ["User"],
         "summary": "User current",
         "parameters": [],
         "security": [{ "Bearer": [] }],
@@ -246,6 +204,61 @@
           },
           "401": {
             "description": "Error token",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/friends": {
+      "get": {
+        "tags": ["Services-Sidebar"],
+        "summary": "Get contacts about services",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServicesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to get services",
+            "content": {}
+          },
+          "404": {
+            "description": "Not found",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/news": {
+      "get": {
+        "tags": ["News"],
+        "summary": "Get news",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to get news",
+            "content": {}
+          },
+          "404": {
+            "description": "Not found",
             "content": {}
           }
         }
@@ -444,24 +457,118 @@
         }
       }
     },
-    "/ads": {
+    "/ads/": {
       "get": {
         "tags": ["Notices"],
-        "summary": "Get all news",
-        "parameters": [],
+        "summary": "Get notices by categories",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Category by notices",
+            "type": "string"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "page pagination",
+            "type": "integer"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "limit for pagination",
+            "type": "integer"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GetAllNewsResponse"
+                  "$ref": "#/components/schemas/AllNoticesResponse"
                 }
               }
             }
           },
-          "404": {
-            "description": "Not found",
+          "400": {
+            "description": "Failed to get all notices",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/ads/add": {
+      "post": {
+        "tags": ["Notices"],
+        "summary": "Add notices",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Notices object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NoticeAddRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NoticeAddResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to get all notices",
+            "content": {}
+          },
+          "401": {
+            "description": "Error token",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/ads/remove/": {
+      "delete": {
+        "tags": ["Notices"],
+        "summary": "Remove notices",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Notice Id",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RemoveNoticeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error occured",
+            "content": {}
+          },
+          "401": {
+            "description": "Error token",
             "content": {}
           }
         }
@@ -608,14 +715,14 @@
                 "example": "Ivan"
               }
             }
-          },
-          "example": {
-            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjc0OTk3OTMyfQ.M6JRm96MLgXda_EvORAd3KDOVOnXNSQkE1v-c-2jano",
-            "longToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjc0OTk3OTMyfQ.M6JRm96MLgXda_EvORAd3KDOVOnXNSQkE1v-c-2jano",
-            "user": {
-              "email": "ivan@gmail.com",
-              "userName": "Ivan"
-            }
+          }
+        },
+        "example": {
+          "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjc0OTk3OTMyfQ.M6JRm96MLgXda_EvORAd3KDOVOnXNSQkE1v-c-2jano",
+          "longToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjc0OTk3OTMyfQ.M6JRm96MLgXda_EvORAd3KDOVOnXNSQkE1v-c-2jano",
+          "user": {
+            "email": "ivan@gmail.com",
+            "userName": "Ivan"
           }
         }
       },
@@ -942,45 +1049,374 @@
           }
         }
       },
-      "GetAllNewsResponse": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "news": {
-              "_id": {
-                "type": "integer",
-                "description": "News id"
-              },
-              "title": {
-                "type": "string",
-                "description": "Head news"
-              },
-              "url": {
-                "type": "string",
-                "description": "url news"
-              },
-              "text": {
-                "type": "string",
-                "description": "Description news"
-              },
-              "dateOfBirth": {
-                "type": "string",
-                "description": "Publication of news date"
+      "AllNoticesResponse": {
+        "type": "object",
+        "properties": {
+          "notices": {
+            "properties": {
+              "type": "array",
+              "items": {
+                "_id": {
+                  "type": "integer",
+                  "description": "Notices id"
+                },
+                "title": {
+                  "type": "string",
+                  "description": "Head notices"
+                },
+                "url": {
+                  "type": "string",
+                  "description": "Url notices"
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Description notices"
+                },
+                "dateOfBirth": {
+                  "type": "string",
+                  "description": "Publication of notices date"
+                }
               }
             }
+          },
+          "totalRecords": {
+            "type": "integer",
+            "description": "total pages",
+            "example": 1
           }
         },
         "example": {
-          "news": [
+          "notices": [
             {
               "_id": 1,
-              "title": "A temporary shelter started working",
+              "title": "Сute dog looking for a home",
               "url": "https://dogcat.com.ua/",
               "text": "Thanks to the efforts of the capital's services and volunteers, a temporary shelter for animals",
               "dateOfBirth": "20.02.2021"
             }
-          ]
+          ],
+          "totalRecords": 1
+        }
+      },
+      "ServicesResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer",
+            "description": "Service id",
+            "example": "1"
+          },
+          "logo": {
+            "type": "buffer",
+            "description": "Service image",
+            "example": "https://lkplev.com/images/logo.png"
+          },
+          "name": {
+            "type": "string",
+            "description": "Service name",
+            "example": "PetHelp"
+          },
+          "friendUrl": {
+            "type": "string",
+            "description": "Url service",
+            "example": "https://lkplev.com/"
+          },
+          "workingHours": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "day": {
+                  "type": "boolean",
+                  "description": "Working days",
+                  "example": "SU"
+                },
+                "from": {
+                  "type": "string",
+                  "description": "open",
+                  "example": "9:00"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "close",
+                  "example": "20:00"
+                }
+              }
+            }
+          },
+          "adress": {
+            "type": "string",
+            "description": "Service address",
+            "example": "Grigorenka Street, 25"
+          },
+          "adressUrl": {
+            "type": "string",
+            "description": "Url service address",
+            "example": "https://goo.gl/maps/3uAThDrKBGLNRBpm6"
+          },
+          "email": {
+            "type": "string",
+            "description": "Service email",
+            "example": "barbos@gmail.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Service phone",
+            "example": "0664880480"
+          }
+        },
+        "example": {
+          "_id": "1",
+          "logo": "https://lkplev.com/images/logo.png",
+          "name": "PetHelp",
+          "friendUrl": "https://lkplev.com/",
+          "workingHours": [
+            {
+              "day": "SU",
+              "from": "9:00",
+              "to": "20:00"
+            }
+          ],
+          "adress": "Grigorenka Street, 25",
+          "adressUrl": "https://goo.gl/maps/3uAThDrKBGLNRBpm6",
+          "email": "barbos@gmail.com",
+          "phone": "0664880480"
+        }
+      },
+      "NewsResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "_id": {
+              "type": "integer",
+              "description": "News id",
+              "example": "1"
+            },
+            "title": {
+              "type": "string",
+              "description": "News header title",
+              "example": "Telegram has launched a chatbot"
+            },
+            "text": {
+              "type": "string",
+              "description": "News text",
+              "example": "A special Telegram bot 'Your Vet Kyiv' was launched in the capital"
+            },
+            "imgURL": {
+              "type": "string",
+              "description": "Url news",
+              "example": "https://phc.org.ua/news"
+            },
+            "date": {
+              "type": "date",
+              "description": "Publication of news",
+              "example": "20/02/2021"
+            }
+          },
+          "example": {
+            "_id": "1",
+            "title": "Telegram has launched a chatbot",
+            "text": "A special Telegram bot 'Your Vet Kyiv' was launched in the capital",
+            "imgURL": "https://phc.org.ua/news",
+            "date": "20/02/2021"
+          }
+        }
+      },
+      "NoticeAddRequest": {
+        "type": "object",
+        "required": ["userId"],
+        "properties": {
+          "categoryId": {
+            "type": "integer",
+            "description": "Category id",
+            "example": "1"
+          },
+          "userId": {
+            "type": "integer",
+            "description": "User's id",
+            "example": 1
+          },
+          "imgURL": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "Url img pet",
+                "example": "pet.jpg"
+              }
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "Сute dog looking for a home"
+          },
+          "petname": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "Jack"
+          },
+          "dateofbirth": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "one year"
+          },
+          "breed": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "Pomeranian"
+          },
+          "sex": {
+            "type": "string",
+            "description": "Sex list: [male, female]",
+            "example": "female"
+          },
+          "location": {
+            "type": "string",
+            "description": "Pet location",
+            "example": "Kyiv"
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price",
+            "example": 5000
+          },
+          "comments": {
+            "type": "string",
+            "description": "Comments",
+            "example": "Very kind, obedient and pure"
+          }
+        },
+        "example": {
+          "imgURL": {
+            "url": "https://dogcat.com.ua/"
+          },
+          "userId": "1",
+          "title": "Сute dog looking for a home",
+          "petname": "Jack",
+          "dateofbirth": "one year",
+          "breed": "Pomeranian",
+          "sex": "female",
+          "location": "Kyiv,Ukraine",
+          "price": "5000",
+          "comments": "Very kind, obedient and pure"
+        }
+      },
+      "NoticeAddResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer",
+            "description": "id",
+            "example": 1
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": "Category id",
+            "example": "1"
+          },
+          "imgURL": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "Url img pet",
+                "example": "pet.jpg"
+              },
+              "publicId": {
+                "type": "integer",
+                "description": "Public id",
+                "example": 1
+              }
+            }
+          },
+          "userId": {
+            "type": "integer",
+            "description": "User's id",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "Сute dog looking for a home"
+          },
+          "petname": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "Jack"
+          },
+          "dateofbirth": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "one year"
+          },
+          "breed": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "Pomeranian"
+          },
+          "sex": {
+            "type": "string",
+            "description": "Sex list: [male, female]",
+            "example": "female"
+          },
+          "location": {
+            "type": "string",
+            "description": "Pet location",
+            "example": "Kyiv"
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price",
+            "example": 5000
+          },
+          "comments": {
+            "type": "string",
+            "description": "Comments",
+            "example": "Very kind, obedient and pure"
+          }
+        },
+        "example": {
+          "_id": "1",
+          "categoryId": "1",
+          "imgURL": {
+            "url": "https://dogcat.com.ua/",
+            "publicId": "1"
+          },
+          "title": "Сute dog looking for a home",
+          "petname": "Jack",
+          "dateofbirth": "one year",
+          "breed": "Pomeranian",
+          "sex": "female",
+          "location": "Kyiv,Ukraine",
+          "price": "5000",
+          "comments": "Very kind, obedient and pure"
+        }
+      },
+      "RemoveNoticeResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Delete success",
+            "example": "Notice delete success"
+          },
+          "_id": {
+            "type": "integer",
+            "description": "id",
+            "example": "1"
+          },
+          "userId": {
+            "type": "integer",
+            "description": "User's id",
+            "example": "1"
+          }
+        },
+        "example": {
+          "message": "Notice delete success",
+          "id": "1",
+          "userId": "1"
         }
       }
     },
