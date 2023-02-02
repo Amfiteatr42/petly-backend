@@ -152,6 +152,34 @@ async function userLogin(req, res) {
     }   
 }
 
+async function userLogout(req, res) {
+    const _id = req.user.id; 
+    const longToken = '';
+    await User.findByIdAndUpdate(_id, { $set: { longToken } })
+        .select({
+            email: 0,
+            password: 0,
+            phone: 0
+        })
+        .exec((err, user) => {
+            if (err) {
+                res.status(500).json({ "message": err });
+                return;
+            }
+            if (!user) {
+                res.status(400).json({ message: `user not found with id: ${id}` });
+                return;
+            }
+            res.json({
+                message: "Logout",
+                data: user,
+             
+            });
+        })        
+     
+        
+}
+
 async function getInfoCurrentUser(req, res) {
     const id = req.user.id;     
     await User.findById(id)
@@ -159,7 +187,7 @@ async function getInfoCurrentUser(req, res) {
         .exec((err, user) => {
             if (err) res.status(500).json({"message": err});
             if (user === null) {
-                res.status(400).json({"message": `user not found with id: ${id}`});
+                res.status(400).json({message: `user not found with id: ${id}`});
                 return;
             }    
             res.json({
@@ -331,6 +359,7 @@ module.exports = {
     userRegistration,
     verificateEmailToken,
     userLogin,
+    userLogout,
     getInfoCurrentUser,
     updateUser,
     refreshUser,

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const newSchema = new mongoose.Schema({
   _id: Number,
-  tytle: {
+  title: {
     type: String,
     required: true,
   },

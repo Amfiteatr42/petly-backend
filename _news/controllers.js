@@ -69,7 +69,21 @@ async function updateNews(req, res) {
     })
 }
 
-async function searchNews(req, res) {}
+async function searchNews(req, res) {
+    
+  const docs = await News.aggregate([
+  {
+    '$search': {
+      'index': 'default',
+      'text': {
+        'query': req.params.str,
+        'path': ["text", "title"]
+      }
+    }
+  }
+]);
+  res.json({ message: "Search result", data: docs });
+}
 
 module.exports = {
   getNews,

@@ -9,7 +9,7 @@ router.get("/", adsControl.getAllAds); //
 
 router.get("/my", checkUser, adsControl.getMyAds); //
 
-router.get("/ad/:id", checkUser, adsControl.getAdById); // 
+router.get("/notice/:id", checkUser, adsControl.getAdById); // 
 
 router.post("/add", checkUser, upload.single('petImg'), adsControl.addAd); // 
 
@@ -17,6 +17,6 @@ router.delete("/remove/:id", checkUser, adsControl.removeAd); //
 
 router.patch("/update/:id", checkUser, upload.single('petImg'), adsControl.updateAd); //
 
-router.get("/search", adsControl.searchAds); // 
+router.get("/search/:str", adsControl.searchAds); // 
 
 module.exports = router;

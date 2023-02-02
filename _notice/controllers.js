@@ -133,7 +133,22 @@ async function updateAd(req, res) {
     
 }
 
-async function searchAds(req, res) {}
+async function searchAds(req, res) {
+  
+  
+  const docs = await Ad.aggregate([
+  {
+    '$search': {
+      'index': 'default',
+      'text': {
+        'query': req.params.str,
+        'path': ["comments", "title"]
+      }
+    }
+  }
+]);
+  res.json({ message: "Search result", data: docs });
+}
 
 module.exports = {
   getAllAds,

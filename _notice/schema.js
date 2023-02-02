@@ -1,7 +1,10 @@
 const mongoose = require('mongoose');
 
 const adSchema = new mongoose.Schema({
-  _id: Number,
+  _id: {
+    type: Number,
+    index: true,
+  },
   categoryId: Number,
    imgURL: {
     url: {

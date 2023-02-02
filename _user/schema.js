@@ -5,19 +5,19 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: true,
     unique: true,
+    index: true,
   },
   avatarURL: {
     url: {
       type: String,
       default: '',
     },
-    publicId: {
+  },
+  publicId: {
       type: String,
       default: '',
-    }
-      
     },
-   email: {
+  email: {
     type: String,
     required: [true, 'Email is required'],
     unique: true,
@@ -36,6 +36,7 @@ const userSchema = new mongoose.Schema({
   }, 
   phone: String,
   favoriteAds: [Number],
+  
   longToken:  {
       type: String,
       default: '',

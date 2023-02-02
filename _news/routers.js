@@ -12,6 +12,6 @@ router.delete("/remove/:id", checkUser, newControl.removeNews); //
 
 router.patch("/update/:id", checkUser, newControl.updateNews); //
 
-router.get("/search", checkUser, newControl.searchNews); //
+router.get("/search/:str", newControl.searchNews); //
 
 module.exports = router;

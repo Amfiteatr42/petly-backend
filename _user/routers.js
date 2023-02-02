@@ -8,12 +8,13 @@ const upload = require('../Helpers/multer.js');
 
 const router = express.Router();
 
-
 router.post('/signup', userControl.userRegistration);
 
-router.get('/verify/:id/:code', userControl.verificateEmailToken);
+router.post('/verify/:id/:code', userControl.verificateEmailToken);
 
-router.get('/login', userControl.userLogin);
+router.post('/login', userControl.userLogin);
+
+router.post('/logout', checkUser, userControl.userLogout);
 
 router.get('/current', checkUser, userControl.getInfoCurrentUser);
 
