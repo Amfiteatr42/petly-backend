@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const newSchema = new mongoose.Schema({
   _id: Number,
@@ -8,12 +8,12 @@ const newSchema = new mongoose.Schema({
   },
   text: String,
   imgURL: String,
-  data: {
+  date: {
     type: Date,
     default: new Date(),
   },
 });
- 
+
 module.exports = {
   newSchema,
 };
