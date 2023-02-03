@@ -3,9 +3,6 @@ const userControl = require('./controllers.js');
 const { checkUser } = require('../middleware/usermiddleware.js');
 const upload = require('../Helpers/multer.js');
 
-
-
-
 const router = express.Router();
 
 router.post('/signup', userControl.userRegistration);
@@ -22,7 +19,12 @@ router.patch('/update', checkUser, userControl.updateUser);
 
 router.patch('/refresh', checkUser, userControl.refreshUser);
 
-router.patch('/avatar', checkUser, upload.single('avatar'), userControl.patchAvatar);
+router.patch(
+  '/avatar',
+  checkUser,
+  upload.single('avatar'),
+  userControl.patchAvatar
+);
 
 router.post('/favorite/:id', checkUser, userControl.setFavoriteAds);
 

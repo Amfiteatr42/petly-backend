@@ -314,7 +314,7 @@ async function patchAvatar(req, res) {
   const result = await uploadCLD(req.file.path);
   console.log('upload   result   ', result);
 
-  if (!user.avatarURL.publicId) {
+  if (user.avatarURL.publicId) {
     await removeCLD(user.avatarURL.publicId);
   }
   user.avatarURL.url = result.url;

@@ -26,8 +26,6 @@ async function addUserPet(req, res) {
   const userId = req.user.id;
   const pet = req.body;
   let imgURL = { url: '', publicId: '' };
-  console.log('========== FILE', req.file);
-  console.log('========== REQUEST', req);
 
   if (req.file) {
     const result = await uploadCLD(req.file.path);
