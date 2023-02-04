@@ -15,10 +15,6 @@ function makeValidate(req, res) {
     const schema = Joi.object({        
         email: Joi.string()
             .email({ minDomainSegments: 2 }),
-        password: Joi.string()
-            .pattern(/^[ а-яА-Яa-zA-Z0-9]+$/)
-            .min(7)
-            .max(32),
         userName: Joi.string()
             .pattern(/^[ а-яА-Яa-zA-Z0-9]+$/)
             .min(3),
@@ -32,7 +28,6 @@ function makeValidate(req, res) {
         });  
     const validate = schema.validate({
         email,
-        password,
         userName,
         city,
         phone,
@@ -45,8 +40,26 @@ function makeValidate(req, res) {
     return true;
 }
 
+function validatePassword(req, res) {
+    const schema = Joi.object({        
+        password: Joi.string()
+            .pattern(/^[ а-яА-Яa-zA-Z0-9]+$/)
+            .min(7)
+            .max(32)
+            .required(),
+        });  
+    const validate = schema.validate({ password } = req.body,);
+    if (validate.error) {
+        res.status(400).send(JSON.stringify({"message": `validate failed with error ${validate.error}`}));
+        return false;
+    };
+    return true;
+}
+
+
 async function userRegistration(req, res) {
     if (!makeValidate(req, res)) return;
+    if (!validatePassword(req, res)) return;
     const { email, password, userName, city, phone, birthday } = req.body;
     console.log( email, password, userName, city, phone );
     
@@ -249,9 +262,6 @@ async function refreshUser(req, res) {
         return;
 
     }
-    console.log("longToken    ===> ", longToken);
-    console.log("user.longToken    ===> ", user.longToken);
-
     if (user.longToken !== longToken) {
         user.longToken = "";
         user.save();
@@ -285,8 +295,7 @@ async function patchAvatar(req, res) {
         return;
     }
     const result = await uploadCLD(req.file.path);
-    console.log("user.avatarURL.publicId", user.avatarURL.publicId);
-    
+      
     if (user.avatarURL.publicId) {
         await removeCLD(user.avatarURL.publicId);
     }
@@ -333,7 +342,7 @@ async function refreshUser(req, res) {
   longToken = await generateToken({ id: user._id });
   const token = await generateToken({ id: user._id });
   await User.findByIdAndUpdate(id, { longToken })
-    .select(['_id', 'email', 'userName', 'city', 'phone'])
+    .select('-password -longToken -verifyEmail -verificationEmailToken -__v')
     .exec((err, user) => {
       if (err) {
         res.status(500).json({ message: err });
@@ -381,13 +390,13 @@ async function updateAvatar(req, res) {
 async function patchAvatar(req, res) {
   const _id = req.user.id;
   const user = await User.findById(_id);
+  
   if (!user) {
     res.status(400).json({ message: `user not found with id: ${id}` });
     return;
   }
-
   const result = await uploadCLD(req.file.path);
-  console.log('upload   result   ', result);
+  await fs.unlink(req.file.path);
 
   if (user.avatarURL.publicId) {
     await removeCLD(user.avatarURL.publicId);
@@ -408,7 +417,8 @@ async function patchAvatar(req, res) {
 async function setFavoriteAds(req, res) {
   const _id = req.user.id;
   const adId = req.params.id;
-  const user = await User.findById(_id);
+  const user = await User.findById(_id)
+    .select('-password -longToken -verifyEmail -verificationEmailToken -__v');
   user.favoriteAds.push(Number(adId));
   user.save(async (err, user) => {
     if (err) {
@@ -424,7 +434,8 @@ async function setFavoriteAds(req, res) {
 async function removeFavoriteAds(req, res) {
   const _id = req.user.id;
   const adId = req.params.id;
-  const user = await User.findById(_id);
+  const user = await User.findById(_id)
+    .select('-password -longToken -verifyEmail -verificationEmailToken -__v');
   user.favoriteAds.splice(user.favoriteAds.indexOf(adId), 1);
   user.save(async (err, user) => {
     if (err) {
@@ -432,7 +443,7 @@ async function removeFavoriteAds(req, res) {
       return;
     }
     res.json({
-      message: 'Favorite ad added',
+      message: 'Favorite ad deleted',
       data: user,
     });
   });

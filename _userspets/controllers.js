@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { getNewID } = require('../Helpers/newID.js');
 const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
+const fs = require('fs/promises');
 
 const { userPetSchema } = require('./schema.js');
 const UserPet = mongoose.model('UsersPets', userPetSchema);
@@ -29,8 +30,8 @@ async function addUserPet(req, res) {
 
   if (req.file) {
     const result = await uploadCLD(req.file.path);
+    await fs.unlink(req.file.path);
     imgURL = { url: result.url, publicId: result.public_id };
-    console.log('upload   result   ', result);
   }
   const userPet = new UserPet({ _id, ...pet, userId, imgURL });
   userPet.save(async (err, pet) => {
@@ -75,6 +76,7 @@ async function updateUserPet(req, res) {
   if (req.file) {
     const result = await uploadCLD(req.file.path);
     pet.imgURL = { url: result.url, publicId: result.public_id };
+    await fs.unlink(req.file.path);
   }
   if (!pet.imgURL.publicId) {
     await removeCLD(pet.imgURL.publicId);

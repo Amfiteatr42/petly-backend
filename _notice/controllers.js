@@ -65,7 +65,7 @@ async function addAd(req, res) {
   const props = req.body;
   const userId = req.user.id;
   let imgURL = { url: '', publicId: '' };
-  if (req.file.originalname) {
+  if (req.file) {
     const result = await uploadCLD(req.file.path);
     imgURL = { url: result.url, publicId: result.public_id };
     console.log("upload   result   ", result);
@@ -105,12 +105,12 @@ async function updateAd(req, res) {
   const userId = req.user.id;
   const prop = { ...req.body };
 
-  let ad = await Ad.findOne({_id, userId})
+  let ad = await Ad.findOne({ _id, userId }).select({ userId: 0, __v: 0 });
   if (!ad) {        
     res.status(400).json({ message: "No found ad"});
     return;
   }
-  if (req.file.originalname) {
+  if (req.file) {
     const result = await uploadCLD(req.file.path);
     ad.imgURL = { url: result.url, publicId: result.public_id };
   } 
