@@ -6,7 +6,7 @@ const adSchema = new mongoose.Schema({
     index: true,
   },
   categoryId: Number,
-   imgURL: {
+  imgURL: {
     url: {
       type: String,
       default: '',
@@ -14,8 +14,8 @@ const adSchema = new mongoose.Schema({
     publicId: {
       type: String,
       default: '',
-    }
-  }, 
+    },
+  },
   userId: {
     type: String,
     required: true,
@@ -26,17 +26,17 @@ const adSchema = new mongoose.Schema({
   breed: String,
   sex: {
     type: String,
-    enum: ['male', 'female']
+    enum: ['male', 'female'],
   },
   location: String,
   price: {
     type: Number,
     default: 0,
   },
-  comments: String
-
+  comments: String,
+  email: String,
+  phone: String,
 });
-
 
 module.exports = {
   adSchema,

@@ -10,13 +10,11 @@ const storage = multer.diskStorage({
 });
 
 function getFileName(file, id) {
-  console.log('======FILENAMe fo0o ,ulter');
   const [fileName, fileExtention] = file.originalname.split('.');
   return fileName + '-' + id + '.' + fileExtention;
 }
 
 function fileFilter(req, file, cb) {
-  console.log('==== FILEFILTER');
   if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
     cb(null, true);
   } else {
