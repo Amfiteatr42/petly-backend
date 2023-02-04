@@ -9,6 +9,7 @@ const { generateToken } = require('../Helpers/token.js');
 
 const {getNewID} = require ('../Helpers/newID.js');
 const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
+const { validateDate } = require('../Helpers/validateDate.js');
 
 
 
@@ -27,8 +28,18 @@ function makeValidate(req, res) {
             .pattern(/^[ а-яА-Яa-zA-Z,-]+$/),
         phone: Joi.string()
             .pattern(/^[\+0-9-()]+$/),
+        birthday: Joi.date()
+            .greater('01-01-1923')
+            .less('01-01-2023'),
         });  
-    const validate = schema.validate({email, password, userName, city, phone}=req.body, );
+    const validate = schema.validate({
+        email,
+        password,
+        userName,
+        city,
+        phone,
+        birthday
+        } = req.body,);
     if (validate.error) {
         res.status(400).send(JSON.stringify({"message": `validate failed with error ${validate.error}`}));
         return false;
@@ -37,15 +48,20 @@ function makeValidate(req, res) {
 }
 
 async function userRegistration(req, res) {
-    console.log("===========================================================", req);
     if (!makeValidate(req, res)) return;
-    const { email, password, userName, city, phone } = req.body;
+    const { email, password, userName, city, phone, birthday } = req.body;
     console.log( email, password, userName, city, phone );
-    const passwordHash = await hashPassword(password);
+    
     const newUser = new User({});
+    newUser.password = await hashPassword(password);
     newUser._id = await getNewID(User); 
     newUser.email = email; 
-    newUser.password = passwordHash;    
+    if (validateDate(birthday)) {
+        newUser.birthday = validateDate(birthday);
+    } else {
+        res.status(400).send(JSON.stringify({"message": `validate failed with error: Validate birthday failed`}));
+        return false;
+    }
     newUser.userName = userName;    
     newUser.city = city;    
     newUser.phone = phone; 
@@ -117,7 +133,8 @@ async function verificateEmailToken(req, res) {
             email: user.email,
             userName: user.userName,
             city: user.city,
-            phone: user.phone
+            phone: user.phone,
+            birthday: user.birthday,
         },
         token: token,
         longToken: longToken        
@@ -137,7 +154,7 @@ async function userLogin(req, res) {
         const token = await generateToken({ id: user._id });
         const longToken = await generateToken({ id: user._id });
         await User.findByIdAndUpdate(user._id, { $set: { longToken } })
-            .select(['_id', 'email', 'userName', 'city', 'phone', 'avatarURL.url'])
+            .select('-publicId -password -longToken -verifyEmail -verifyEmail -verificationEmailToken -__v')
             .exec((err, user) => {
                 if (err) res.status(500).json({"message": err});
                 res.json({
@@ -156,11 +173,7 @@ async function userLogout(req, res) {
     const _id = req.user.id; 
     const longToken = '';
     await User.findByIdAndUpdate(_id, { $set: { longToken } })
-        .select({
-            email: 0,
-            password: 0,
-            phone: 0
-        })
+       .select('-publicId -password -longToken -verifyEmail -verifyEmail -verificationEmailToken -__v')
         .exec((err, user) => {
             if (err) {
                 res.status(500).json({ "message": err });
@@ -175,15 +188,13 @@ async function userLogout(req, res) {
                 data: user,
              
             });
-        })        
-     
-        
+        })         
 }
 
 async function getInfoCurrentUser(req, res) {
     const id = req.user.id;     
     await User.findById(id)
-        .select(['_id', 'email', 'userName', 'city', 'phone'])
+        .select('-publicId -password -longToken -verifyEmail -verifyEmail -verificationEmailToken -__v')
         .exec((err, user) => {
             if (err) res.status(500).json({"message": err});
             if (user === null) {
@@ -201,9 +212,16 @@ async function updateUser(req, res) {
     if (!makeValidate(req, res)) return;
     const id = req.user.id;  
     const prop = req.body;   
+    const { birthday } = req.body;
+    if (birthday) {
+        if (!validateDate(birthday)) {
+            res.status(400).send(JSON.stringify({ "message": `validate failed with error: Validate birthday failed` }));
+            return;
+        }
+    }
     if (prop) {
         await User.findByIdAndUpdate(id, { $set: { ...prop } }, { returnDocument: 'after' })
-                .select(['_id', 'email', 'userName', 'city', 'phone'])
+                .select('-publicId -password -longToken -verifyEmail -verifyEmail -verificationEmailToken -__v')
                 .exec((err, user) => {
                     if (err) {
                         res.status(500).json({ "message": err });
@@ -246,7 +264,7 @@ async function refreshUser(req, res) {
     longToken = await generateToken({ id: user._id });
     const token = await generateToken({ id: user._id });
     await User.findByIdAndUpdate(id, { longToken })
-        .select(['_id', 'email', 'userName', 'city', 'phone'])
+        .select('-publicId -password -longToken -verifyEmail -verifyEmail -verificationEmailToken -__v')
         .exec((err, user) => {
             if (err) {
                 res.status(500).json({ "message": err });
@@ -261,50 +279,18 @@ async function refreshUser(req, res) {
         });
 }
 
-async function updateAvatar(req, res) {
-    
-    try {
-        const id = req.user.id; 
-        await User.findById(id)
-            .exec(async(err, user) => {                
-                if (err) {
-                    res.status(500).json({ "message": err });
-                    return;
-                }
-                if (user === null) {
-                    res.status(400).json({ "message": `user not found with id: ${id}` });
-                    return;
-                }
-                try {
-                    await fs.access(user.avatarURL, fs.constants.F_OK); 
-                    await fs.unlink(user.avatarURL);                     
-                } catch (err) {
-                    console.log("наверное нет такого файла или что то не так");                  
-                } 
-                user.avatarURL = req.file.newpath;
-                user.save();
-            });
-       
-        await fs.cp(req.file.path, req.file.newpath);  
-        res.json({ "message": "success" });
-    } catch (err) {
-        res.status(400).json({ "message": "File did not save" });
-    } finally {
-        await fs.unlink(req.file.path);         
-    }    
-}
 async function patchAvatar(req, res) {
     const _id = req.user.id; 
-    const user = await User.findById(_id);
+    const user = await User.findById(_id)
+        .select('-password -longToken -verifyEmail -verificationEmailToken -__v');
     if (!user) {
         res.status(400).json({ message: `user not found with id: ${id}` });
         return;
     }
-
     const result = await uploadCLD(req.file.path);
-    console.log("upload   result   ", result);
+    console.log("user.avatarURL.publicId", user.avatarURL.publicId);
     
-    if (!user.avatarURL.publicId) {
+    if (user.avatarURL.publicId) {
         await removeCLD(user.avatarURL.publicId);
     }
     user.avatarURL.url = result.url;
@@ -316,7 +302,7 @@ async function patchAvatar(req, res) {
         }
         res.json({
         message: "Aavatar update",
-        data: { avatarURL: user.avatarURL},
+        data: user,
         });
     })
 
@@ -363,7 +349,6 @@ module.exports = {
     getInfoCurrentUser,
     updateUser,
     refreshUser,
-    updateAvatar,
     patchAvatar,
     setFavoriteAds,
     removeFavoriteAds,
