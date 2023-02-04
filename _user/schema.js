@@ -12,11 +12,11 @@ const userSchema = new mongoose.Schema({
       type: String,
       default: '',
     },
-  },
-  publicId: {
+    publicId: {
       type: String,
       default: '',
-    },
+    }
+  },   
   email: {
     type: String,
     required: [true, 'Email is required'],
@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
   }, 
   phone: String,
   favoriteAds: [Number],
-  
+  birthday: Date,  
   longToken:  {
       type: String,
       default: '',
