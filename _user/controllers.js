@@ -307,7 +307,7 @@ async function patchAvatar(req, res) {
         });
       });
   }
-}
+
 
 async function refreshUser(req, res) {
   let [_, longToken] = req.headers.authorization.split(' ');
