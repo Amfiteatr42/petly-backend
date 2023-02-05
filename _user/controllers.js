@@ -12,6 +12,7 @@ const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
 const { validateDate } = require('../Helpers/validateDate.js');
 
 function makeValidate(req, res) {
+  console.log(1);
   const schema = Joi.object({
     email: Joi.string().email({ minDomainSegments: 2 }),
     userName: Joi.string()
@@ -19,31 +20,17 @@ function makeValidate(req, res) {
       .min(3),
     city: Joi.string().pattern(/^[ а-яА-Яa-zA-Z,-]+$/),
     phone: Joi.string().pattern(/^[\+0-9-()]+$/),
-    birthday: Joi.date().greater('01-01-1923').less('01-01-2023'),
-  });
-  const validate = schema.validate(
-    ({ email, userName, city, phone, birthday } = req.body)
-  );
-  if (validate.error) {
-    res.status(400).send(
-      JSON.stringify({
-        message: `validate failed with error ${validate.error}`,
-      })
-    );
-    return false;
-  }
-  return true;
-}
-
-function validatePassword(req, res) {
-  const schema = Joi.object({
     password: Joi.string()
       .pattern(/^[ а-яА-Яa-zA-Z0-9]+$/)
       .min(7)
       .max(32)
       .required(),
   });
-  const validate = schema.validate(({ password } = req.body));
+  console.log(2);
+  const validate = schema.validate(
+    ({ email, userName, city, phone, password } = req.body)
+  );
+  console.log(3);
   if (validate.error) {
     res.status(400).send(
       JSON.stringify({
@@ -55,26 +42,47 @@ function validatePassword(req, res) {
   return true;
 }
 
+// function validatePassword(req, res) {
+//   const schema = Joi.object({
+//     password: Joi.string()
+//       .pattern(/^[ а-яА-Яa-zA-Z0-9]+$/)
+//       .min(7)
+//       .max(32)
+//       .required(),
+//   });
+//   const validate = schema.validate(req.body.password);
+//   if (validate.error) {
+//     res.status(400).send(
+//       JSON.stringify({
+//         message: `validate failed with error ${validate.error}`,
+//       })
+//     );
+//     return false;
+//   }
+//   return true;
+// }
+
 async function userRegistration(req, res) {
   if (!makeValidate(req, res)) return;
-  if (!validatePassword(req, res)) return;
-  const { email, password, userName, city, phone, birthday } = req.body;
+  console.log('passed validate');
+  // if (!validatePassword(req, res)) return;
+  const { email, password, userName, city, phone } = req.body;
   //console.log(email, password, userName, city, phone);
 
   const newUser = new User({});
   newUser.password = await hashPassword(password);
   newUser._id = await getNewID(User);
   newUser.email = email;
-  if (validateDate(birthday)) {
-    newUser.birthday = validateDate(birthday);
-  } else {
-    res.status(400).send(
-      JSON.stringify({
-        message: `validate failed with error: Validate birthday failed`,
-      })
-    );
-    return false;
-  }
+  // if (validateDate(birthday)) {
+  //   newUser.birthday = validateDate(birthday);
+  // } else {
+  //   res.status(400).send(
+  //     JSON.stringify({
+  //       message: `validate failed with error: Validate birthday failed`,
+  //     })
+  //   );
+  //   return false;
+  // }
   newUser.userName = userName;
   newUser.city = city;
   newUser.phone = phone;
@@ -148,7 +156,6 @@ async function verificateEmailToken(req, res) {
       userName: user.userName,
       city: user.city,
       phone: user.phone,
-      birthday: user.birthday,
     },
     token: token,
     longToken: longToken,
