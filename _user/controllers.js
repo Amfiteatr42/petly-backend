@@ -237,7 +237,7 @@ async function getInfoCurrentUser(req, res) {
 }
 
 async function updateUser(req, res) {
-  if (!makeValidate(req, res)) return;
+  //if (!makeValidate(req, res)) return;
   const id = req.user.id;
   const prop = req.body;
   const { birthday } = req.body;
