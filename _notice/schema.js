@@ -22,7 +22,7 @@ const adSchema = new mongoose.Schema({
   },
   title: String,
   petname: String,
-  dateofbirth: Date,
+  dateofbirth: String,
   breed: String,
   sex: {
     type: String,
@@ -30,7 +30,7 @@ const adSchema = new mongoose.Schema({
   },
   location: String,
   price: {
-    type: Number,
+    type: String,
     default: 0,
   },
   comments: String,

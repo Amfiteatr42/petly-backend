@@ -62,15 +62,16 @@ async function getAdById(req, res) {
 async function addAd(req, res) {
   const _id = await getNewID(Ad);
   const props = req.body;
+
   const userId = req.user.id;
   let imgURL = { url: '', publicId: '' };
   if (req.file) {
     const result = await uploadCLD(req.file.path);
     imgURL = { url: result.url, publicId: result.public_id };
-    console.log('upload   result   ', result);
+    //console.log('upload   result   ', result);
   }
   const newAd = new Ad({ _id, ...props, userId, imgURL });
-  console.log(newAd);
+  //console.log('NEWS AD', newAd);
   newAd.save(async (err, ad) => {
     if (err) {
       res.status(400).json({ message: 'Error occurred', err: err });

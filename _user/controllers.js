@@ -12,7 +12,6 @@ const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
 const { validateDate } = require('../Helpers/validateDate.js');
 
 function makeValidate(req, res) {
-  console.log(1);
   const schema = Joi.object({
     email: Joi.string().email({ minDomainSegments: 2 }),
     userName: Joi.string()
@@ -26,11 +25,9 @@ function makeValidate(req, res) {
       .max(32)
       .required(),
   });
-  console.log(2);
   const validate = schema.validate(
     ({ email, userName, city, phone, password } = req.body)
   );
-  console.log(3);
   if (validate.error) {
     res.status(400).send(
       JSON.stringify({
@@ -64,7 +61,6 @@ function makeValidate(req, res) {
 
 async function userRegistration(req, res) {
   if (!makeValidate(req, res)) return;
-  console.log('passed validate');
   // if (!validatePassword(req, res)) return;
   const { email, password, userName, city, phone } = req.body;
   //console.log(email, password, userName, city, phone);
