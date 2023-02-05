@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "title": "Pets Support",
     "description": "Backend documentation",
     "license": {
@@ -209,6 +209,49 @@
         }
       }
     },
+    "/users/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User logout",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "User's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogoutResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "User not found or not authorized",
+            "content": {}
+          },
+          "403": {
+            "description": "Invalid token",
+            "content": {}
+          },
+          "401": {
+            "description": "Error token",
+            "content": {}
+          }
+        }
+      }
+    },
     "/friends": {
       "get": {
         "tags": ["Services-Sidebar"],
@@ -259,108 +302,6 @@
           },
           "404": {
             "description": "Not found",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/adscategory": {
-      "get": {
-        "tags": ["Notices"],
-        "summary": "Get notices category",
-        "parameters": [],
-        "security": [{ "Bearer": [] }],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetNoticesCategoryResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Failed to get category",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/adscategory/add": {
-      "post": {
-        "tags": ["Notices"],
-        "summary": "Add notices category",
-        "parameters": [],
-        "security": [{ "Bearer": [] }],
-        "requestBody": {
-          "description": "Add notices",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AddNoticesRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AddNoticesResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Failed to add category or it already exists",
-            "content": {}
-          }
-        }
-      }
-    },
-    "/adscategory/update/": {
-      "patch": {
-        "tags": ["Notices"],
-        "summary": "Update notices category",
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "type": "string",
-            "description": "Id notices category"
-          }
-        ],
-        "security": [{ "Bearer": [] }],
-        "requestBody": {
-          "description": "Update notices on id",
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateNoticesRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UpdateNoticesResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Failed to update category",
             "content": {}
           }
         }
@@ -457,14 +398,14 @@
         }
       }
     },
-    "/ads/": {
+    "/notice": {
       "get": {
         "tags": ["Notices"],
         "summary": "Get notices by categories",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
+            "name": "categoryId",
+            "in": "query",
             "description": "Category by notices",
             "type": "string"
           },
@@ -499,7 +440,116 @@
         }
       }
     },
-    "/ads/add": {
+    "/notice/ad/": {
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Get one notice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Get one notice",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetONEResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to get one notice",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/users/favorite/": {
+      "post": {
+        "tags": ["Notices"],
+        "summary": "Add notices to favorites",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id user",
+            "type": "string"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Notices object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FavoriteNotivesAddRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FavoriteNotivesAddResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to add favorite notices",
+            "content": {}
+          },
+          "401": {
+            "description": "Error token",
+            "content": {}
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Notices"],
+        "summary": "Delete notices from favorites",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "id user",
+            "type": "string"
+          }
+        ],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteFavoriteNotivesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to delete favorite notices",
+            "content": {}
+          },
+          "401": {
+            "description": "Error token",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/notice/add": {
       "post": {
         "tags": ["Notices"],
         "summary": "Add notices",
@@ -538,7 +588,35 @@
         }
       }
     },
-    "/ads/remove/": {
+    "/notice/my": {
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Get notices authorized user",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetNoticesAuthUserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Failed to get notices auth user",
+            "content": {}
+          },
+          "401": {
+            "description": "Error token",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/notice/remove/": {
       "delete": {
         "tags": ["Notices"],
         "summary": "Remove notices",
@@ -850,39 +928,38 @@
           "longToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MiwiaWF0IjoxNjc0OTk3OTMyfQ.M6JRm96MLgXda_EvORAd3KDOVOnXNSQkE1v-c-2jano"
         }
       },
-      "GetNoticesCategoryResponse": {
-        "type": "array",
-        "items": {
-          "type": "object",
-          "properties": {
-            "_id": {
-              "type": "integer",
-              "description": "User's id"
-            },
-            "nameCategory": {
-              "type": "string",
-              "description": "sell"
-            }
+      "LogoutRequest": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer",
+            "description": "User's id"
+          }
+        }
+      },
+      "LogoutResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer",
+            "description": "User's id"
+          },
+          "userName": {
+            "type": "string",
+            "description": "User's name",
+            "example": "Ivan"
+          },
+          "message": {
+            "type": "string",
+            "description": "Status operation message",
+            "example": "Logout success"
           }
         },
-        "example": [
-          {
-            "_id": 1,
-            "nameCategory": "sell"
-          }
-        ]
-      },
-      "AddNoticesRequest": {
-        "type": "object"
-      },
-      "AddNoticesResponse": {
-        "type": "object"
-      },
-      "UpdateNoticesRequest": {
-        "type": "object"
-      },
-      "UpdateNoticesResponse": {
-        "type": "object"
+        "example": {
+          "_id": "1",
+          "userName": "Ivan",
+          "message": "Logout success"
+        }
       },
       "GetPetsUserResponse": {
         "type": "array",
@@ -894,8 +971,19 @@
               "description": "User's id"
             },
             "imgURL": {
-              "type": "string",
-              "description": "Image pet"
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "Url img pet",
+                  "example": "pet.jpg"
+                },
+                "publicId": {
+                  "type": "integer",
+                  "description": "Public id",
+                  "example": 1
+                }
+              }
             },
             "name": {
               "type": "string",
@@ -918,7 +1006,10 @@
         "example": [
           {
             "_id": 1,
-            "imgURL": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg",
+            "imgURL": {
+              "url": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg",
+              "publicId": "1"
+            },
             "name": "Lucky",
             "dateOfBirth": "2020-02-09T22:00:00.000Z",
             "breed": "Setter",
@@ -960,8 +1051,19 @@
               "description": "Pet's id"
             },
             "imgURL": {
-              "type": "string",
-              "description": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg"
+              "type": "object",
+              "properties": {
+                "url": {
+                  "type": "string",
+                  "description": "Url img pet",
+                  "example": "pet.jpg"
+                },
+                "publicId": {
+                  "type": "integer",
+                  "description": "Public id",
+                  "example": 1
+                }
+              }
             },
             "name": {
               "type": "string",
@@ -988,7 +1090,10 @@
         "example": {
           "pet": {
             "_id": "1",
-            "imgURL": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg",
+            "imgURL": {
+              "url": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg",
+              "publicId": "1"
+            },
             "name": "Jack",
             "dateOfBirth": "22.04.2018",
             "breed": "JKKKKKK",
@@ -1006,13 +1111,21 @@
           },
           "pet": {
             "_id": {
-              "type": "string",
+              "type": "integer",
               "description": "id pet",
-              "example": "Pet 'Jack' has been deleted"
+              "example": 1
             },
             "imgURL": {
-              "type": "string",
-              "description": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg"
+              "url": {
+                "type": "string",
+                "description": "url image",
+                "example": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg"
+              },
+              "publicId": {
+                "type": "integer",
+                "description": "id",
+                "example": 1
+              }
             },
             "name": {
               "type": "string",
@@ -1041,7 +1154,10 @@
           "message": "Pet 'Jack' has been deleted",
           "pet": {
             "_id": "1",
-            "imgURL": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg",
+            "imgURL": {
+              "url": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg",
+              "publicId": 1
+            },
             "name": "Jack",
             "dateOfBirth": "22.04.2018",
             "breed": "JKKKKKK",
@@ -1058,23 +1174,65 @@
               "items": {
                 "_id": {
                   "type": "integer",
-                  "description": "Notices id"
+                  "description": "Notices id",
+                  "example": 1
+                },
+                "categoryId": {
+                  "type": "integer",
+                  "description": "Notices category id",
+                  "example": 1
+                },
+                "imgURL": {
+                  "url": {
+                    "type": "string",
+                    "description": "url image",
+                    "example": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg"
+                  },
+                  "publicId": {
+                    "type": "integer",
+                    "description": "public id",
+                    "example": 1
+                  }
                 },
                 "title": {
                   "type": "string",
-                  "description": "Head notices"
+                  "description": "Head notices",
+                  "example": "in good hands"
                 },
-                "url": {
+                "petname": {
                   "type": "string",
-                  "description": "Url notices"
+                  "description": "name pet",
+                  "example": "Jack"
                 },
-                "text": {
+                "dateofbirth": {
                   "type": "string",
-                  "description": "Description notices"
+                  "description": "Pet's birthday",
+                  "example": "20.02.2020"
                 },
-                "dateOfBirth": {
+                "breed": {
                   "type": "string",
-                  "description": "Publication of notices date"
+                  "description": "Pet's breed",
+                  "example": "husky"
+                },
+                "sex": {
+                  "type": "string",
+                  "description": "Sex of the pet",
+                  "example": "female"
+                },
+                "location": {
+                  "type": "string",
+                  "description": "Location",
+                  "example": "Kyiv"
+                },
+                "price": {
+                  "type": "string",
+                  "description": "Price of the pet",
+                  "example": "1000"
+                },
+                "comments": {
+                  "type": "string",
+                  "description": "Comment about the pets",
+                  "example": "Friendly, calm and kind"
                 }
               }
             }
@@ -1089,13 +1247,165 @@
           "notices": [
             {
               "_id": 1,
+              "categoryId": 1,
+              "imgURL": {
+                "url": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg",
+                "publicId": 1
+              },
               "title": "Сute dog looking for a home",
-              "url": "https://dogcat.com.ua/",
-              "text": "Thanks to the efforts of the capital's services and volunteers, a temporary shelter for animals",
-              "dateOfBirth": "20.02.2021"
+              "petname": "Jack",
+              "breed": "husky",
+              "sex": "female",
+              "location": "Kyiv",
+              "price": "1000",
+              "comments": "Friendly, calm and kind",
+              "dateofbirth": "20.02.2021"
             }
           ],
           "totalRecords": 1
+        }
+      },
+      "GetONEResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer",
+            "description": "Notices id",
+            "example": 1
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": "Notices category id",
+            "example": 1
+          },
+          "imgURL": {
+            "url": {
+              "type": "string",
+              "description": "url image",
+              "example": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg"
+            },
+            "publicId": {
+              "type": "integer",
+              "description": "public id",
+              "example": 1
+            }
+          },
+          "title": {
+            "type": "string",
+            "description": "Head notices",
+            "example": "in good hands"
+          },
+          "petname": {
+            "type": "string",
+            "description": "name pet",
+            "example": "Jack"
+          },
+          "dateofbirth": {
+            "type": "string",
+            "description": "Pet's birthday",
+            "example": "20.02.2020"
+          },
+          "breed": {
+            "type": "string",
+            "description": "Pet's breed",
+            "example": "husky"
+          },
+          "sex": {
+            "type": "string",
+            "description": "Sex of the pet",
+            "example": "female"
+          },
+          "location": {
+            "type": "string",
+            "description": "Location",
+            "example": "Kyiv"
+          },
+          "price": {
+            "type": "string",
+            "description": "Price of the pet",
+            "example": "1000"
+          },
+          "comments": {
+            "type": "string",
+            "description": "Comment about the pets",
+            "example": "Friendly, calm and kind"
+          }
+        },
+        "example": {
+          "_id": 1,
+          "categoryId": 1,
+          "imgURL": {
+            "url": "https://zoo-club.com.ua/image/cache/catalog/blog/news003-910x605.jpg",
+            "publicId": 1
+          },
+          "title": "Сute dog looking for a home",
+          "petname": "Jack",
+          "breed": "husky",
+          "sex": "female",
+          "location": "Kyiv",
+          "price": "1000",
+          "comments": "Friendly, calm and kind",
+          "dateofbirth": "20.02.2021"
+        }
+      },
+      "FavoriteNotivesAddRequest": {
+        "type": "object",
+        "required": ["_id"],
+        "properties": {
+          "_id": {
+            "type": "integer",
+            "description": "Notices add to favorite id",
+            "example": 1
+          },
+          "favoriteAds": {
+            "type": "integer",
+            "description": "favorite id",
+            "example": 1
+          }
+        }
+      },
+      "FavoriteNotivesAddResponse": {
+        "type": "object",
+        "properties": {
+          "favoriteAds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Notices add to favorite, yes or no ?",
+            "example": "Notices add to favorite"
+          },
+          "message": {
+            "type": "string",
+            "description": "Notices add to favorite, yes or no ?",
+            "example": "Notices add to favorite"
+          }
+        },
+        "example": {
+          "favoriteAds": [1231231312, 4342342343, 4235252355],
+          "message": "Notices add to favorite"
+        }
+      },
+      "DeleteFavoriteNotivesResponse": {
+        "type": "object",
+        "properties": {
+          "favoriteAds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Notices delete from favorite, yes or no ?",
+            "example": "Notices delete from favorite"
+          },
+          "message": {
+            "type": "string",
+            "description": "Notices delete from favorite, yes or no ?",
+            "example": "Notices delete from favorite"
+          }
+        },
+        "example": {
+          "favoriteAds": [1231231312, 4342342343, 4235252355],
+          "message": "Notices delete from favorite"
         }
       },
       "ServicesResponse": {
@@ -1225,7 +1535,7 @@
       },
       "NoticeAddRequest": {
         "type": "object",
-        "required": ["userId"],
+        "required": ["userId", "title", "sex", "location"],
         "properties": {
           "categoryId": {
             "type": "integer",
@@ -1244,6 +1554,11 @@
                 "type": "string",
                 "description": "Url img pet",
                 "example": "pet.jpg"
+              },
+              "publicId": {
+                "type": "integer",
+                "description": "Public id",
+                "example": 1
               }
             }
           },
@@ -1287,12 +1602,89 @@
             "description": "Comments",
             "example": "Very kind, obedient and pure"
           }
+        }
+      },
+      "NoticeAddResponse": {
+        "type": "object",
+        "properties": {
+          "_id": {
+            "type": "integer",
+            "description": "id",
+            "example": 1
+          },
+          "categoryId": {
+            "type": "integer",
+            "description": "Category id",
+            "example": "1"
+          },
+          "imgURL": {
+            "type": "object",
+            "properties": {
+              "url": {
+                "type": "string",
+                "description": "Url img pet",
+                "example": "pet.jpg"
+              },
+              "publicId": {
+                "type": "integer",
+                "description": "Public id",
+                "example": 1
+              }
+            }
+          },
+          "userId": {
+            "type": "integer",
+            "description": "User's id",
+            "example": 1
+          },
+          "title": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "Сute dog looking for a home"
+          },
+          "petname": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "Jack"
+          },
+          "dateofbirth": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "one year"
+          },
+          "breed": {
+            "type": "string",
+            "description": "Pets breed",
+            "example": "Pomeranian"
+          },
+          "sex": {
+            "type": "string",
+            "description": "Sex list: [male, female]",
+            "example": "female"
+          },
+          "location": {
+            "type": "string",
+            "description": "Pet location",
+            "example": "Kyiv"
+          },
+          "price": {
+            "type": "integer",
+            "description": "Price",
+            "example": 5000
+          },
+          "comments": {
+            "type": "string",
+            "description": "Comments",
+            "example": "Very kind, obedient and pure"
+          }
         },
         "example": {
+          "_id": "1",
+          "categoryId": "1",
           "imgURL": {
-            "url": "https://dogcat.com.ua/"
+            "url": "https://dogcat.com.ua/",
+            "publicId": "1"
           },
-          "userId": "1",
           "title": "Сute dog looking for a home",
           "petname": "Jack",
           "dateofbirth": "one year",
@@ -1303,7 +1695,7 @@
           "comments": "Very kind, obedient and pure"
         }
       },
-      "NoticeAddResponse": {
+      "GetNoticesAuthUserResponse": {
         "type": "object",
         "properties": {
           "_id": {
