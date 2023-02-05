@@ -20,22 +20,27 @@ const adSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  title: String,
+  title: {
+    type: String,
+    required: [true, 'title is required'],
+  },
   petname: String,
   dateofbirth: String,
   breed: String,
   sex: {
     type: String,
     enum: ['male', 'female'],
+    required: [true, 'sex is required'],
   },
-  location: String,
+  location: {
+    type: String,
+    required: [true, 'location is required'],
+  },
   price: {
     type: String,
     default: 0,
   },
   comments: String,
-  email: String,
-  phone: String,
 });
 
 module.exports = {
