@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
-const userPetSchema = new mongoose.Schema({ 
-  _id: Number,
+const userPetSchema = new mongoose.Schema({
+  // _id: Number,
   imgURL: {
     url: {
       type: String,
@@ -10,8 +10,8 @@ const userPetSchema = new mongoose.Schema({
     publicId: {
       type: String,
       default: '',
-    }
-  },   
+    },
+  },
   name: {
     type: String,
     min: 2,
@@ -19,9 +19,8 @@ const userPetSchema = new mongoose.Schema({
   dateOfBirth: Date,
   breed: String,
   comment: String,
-  userId: Number,
+  userId: mongoose.SchemaTypes.ObjectId,
 });
-
 
 module.exports = {
   userPetSchema,

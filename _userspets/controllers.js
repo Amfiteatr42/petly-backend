@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { getNewID } = require('../Helpers/newID.js');
+// const { getNewID } = require('../Helpers/newID.js');
 const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
 const fs = require('fs/promises');
 
@@ -23,7 +23,7 @@ async function getUserPets(req, res) {
 }
 
 async function addUserPet(req, res) {
-  const _id = await getNewID(UserPet);
+  //const _id = await getNewID(UserPet);
   const userId = req.user.id;
   const pet = req.body;
   let imgURL = { url: '', publicId: '' };
@@ -33,7 +33,7 @@ async function addUserPet(req, res) {
     await fs.unlink(req.file.path);
     imgURL = { url: result.url, publicId: result.public_id };
   }
-  const userPet = new UserPet({ _id, ...pet, userId, imgURL });
+  const userPet = new UserPet({ ...pet, userId, imgURL });
   userPet.save(async (err, pet) => {
     if (err) {
       res.status(500).json({ message: 'Error occurred', err: err });
