@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { getNewID } = require('../Helpers/newID.js');
+//const { getNewID } = require('../Helpers/newID.js');
 const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
 
 const { adSchema } = require('./schema.js');
@@ -14,6 +14,7 @@ async function getAllAds(req, res) {
 
   await Ad.find(prop)
     .select({ userId: 0, __v: 0 })
+    .populate('owner', 'phone email -_id')
     .skip((Number(page) - 1) * Number(limit))
     .limit(Number(limit))
     .exec((err, pets) => {
@@ -32,6 +33,7 @@ async function getMyAds(req, res) {
   const userId = req.user.id;
   await Ad.find({ userId })
     .select({ userId: 0, __v: 0 })
+    .populate('owner', 'phone email -_id')
     .exec((err, pets) => {
       if (err) {
         res.status(500).json({ message: err });
@@ -47,6 +49,7 @@ async function getAdById(req, res) {
   const _id = req.params.id;
   await Ad.findOne({ _id })
     .select({ userId: 0, __v: 0 })
+    .populate('owner', 'phone email -_id')
     .exec((err, pets) => {
       if (err) {
         res.status(500).json({ message: err });
@@ -60,17 +63,19 @@ async function getAdById(req, res) {
 }
 
 async function addAd(req, res) {
-  const _id = await getNewID(Ad);
+  //const _id = await getNewID(Ad);
   const props = req.body;
 
   const userId = req.user.id;
+  const owner = req.user.id;
+
   let imgURL = { url: '', publicId: '' };
   if (req.file) {
     const result = await uploadCLD(req.file.path);
     imgURL = { url: result.url, publicId: result.public_id };
     //console.log('upload   result   ', result);
   }
-  const newAd = new Ad({ _id, ...props, userId, imgURL });
+  const newAd = new Ad({ ...props, userId, owner, imgURL });
   //console.log('NEWS AD', newAd);
   newAd.save(async (err, ad) => {
     if (err) {

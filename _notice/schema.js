@@ -1,10 +1,10 @@
-const mongoose = require('mongoose');
+const { Schema, SchemaTypes } = require('mongoose');
 
-const adSchema = new mongoose.Schema({
-  _id: {
-    type: Number,
-    index: true,
-  },
+const adSchema = new Schema({
+  // _id: {
+  //   type: Number,
+  //   index: true,
+  // },
   categoryId: Number,
   imgURL: {
     url: {
@@ -19,6 +19,10 @@ const adSchema = new mongoose.Schema({
   userId: {
     type: String,
     required: true,
+  },
+  owner: {
+    type: SchemaTypes.ObjectId,
+    ref: 'User',
   },
   title: {
     type: String,

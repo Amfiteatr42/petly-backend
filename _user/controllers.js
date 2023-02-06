@@ -7,7 +7,7 @@ const User = mongoose.model('User', userSchema);
 const { hashPassword, comparePasswords } = require('../Helpers/password.js');
 const { generateToken } = require('../Helpers/token.js');
 
-const { getNewID } = require('../Helpers/newID.js');
+// const { getNewID } = require('../Helpers/newID.js');
 const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
 const { validateDate } = require('../Helpers/validateDate.js');
 
@@ -67,7 +67,7 @@ async function userRegistration(req, res) {
 
   const newUser = new User({});
   newUser.password = await hashPassword(password);
-  newUser._id = await getNewID(User);
+  // newUser._id = await getNewID(User);
   newUser.email = email;
   // if (validateDate(birthday)) {
   //   newUser.birthday = validateDate(birthday);
@@ -125,7 +125,7 @@ async function userRegistration(req, res) {
 }
 async function verificateEmailToken(req, res) {
   const { id, code } = req.params;
-  const user = await User.findById(Number(id));
+  const user = await User.findById(id);
   if (user === null) {
     res.status(400).json({ message: 'User not found' });
     return;
