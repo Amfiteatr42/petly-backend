@@ -14,7 +14,7 @@ async function getAllAds(req, res) {
 
   await Ad.find(prop)
     .select({ userId: 0, __v: 0 })
-    .populate('owner', 'phone email -_id')
+    .populate('owner', 'phone email userName -_id')
     .skip((Number(page) - 1) * Number(limit))
     .limit(Number(limit))
     .exec((err, pets) => {
