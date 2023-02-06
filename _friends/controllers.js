@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const { getNewID } = require('../Helpers/newID.js');
+//const { getNewID } = require('../Helpers/newID.js');
 
 const { friendSchema } = require('./schema.js');
 const Friends = mongoose.model('Friends', friendSchema);

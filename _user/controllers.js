@@ -445,7 +445,7 @@ async function setFavoriteAds(req, res) {
   const user = await User.findById(_id).select(
     '-password -longToken -verifyEmail -verificationEmailToken -__v'
   );
-  user.favoriteAds.push(Number(adId));
+  user.favoriteAds.push(adId);
   user.save(async (err, user) => {
     if (err) {
       res.status(500).json({ message: 'Error occurred', err: err });
