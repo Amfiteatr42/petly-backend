@@ -1,10 +1,6 @@
 const { Schema, SchemaTypes } = require('mongoose');
 
 const adSchema = new Schema({
-  // _id: {
-  //   type: Number,
-  //   index: true,
-  // },
   categoryId: Number,
   imgURL: {
     url: {

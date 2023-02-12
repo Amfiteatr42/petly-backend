@@ -1,6 +1,6 @@
-const crypto = require("crypto");
+const crypto = require('crypto');
 
-const hashPassword = (password) =>
+const hashPassword = password =>
   new Promise((resolve, reject) => {
     const salt = crypto.randomBytes(16);
     crypto.scrypt(password, salt, 256, (err, hash) => {
@@ -9,14 +9,13 @@ const hashPassword = (password) =>
         return;
       }
 
-      resolve(Buffer.concat([salt, hash]).toString("base64"));
+      resolve(Buffer.concat([salt, hash]).toString('base64'));
     });
   });
 
-const comparePasswords = (unhashedPassword, passwordFromDb) =>
-  {console.log("ndaskjfbvaksdjhbgkljsdBvl",passwordFromDb)
+const comparePasswords = (unhashedPassword, passwordFromDb) => {
   return new Promise((resolve, reject) => {
-    const buf = Buffer.from(passwordFromDb, "base64");
+    const buf = Buffer.from(passwordFromDb, 'base64');
     const salt = buf.subarray(0, 16);
     const hashedPassword = buf.subarray(16);
 
@@ -27,9 +26,10 @@ const comparePasswords = (unhashedPassword, passwordFromDb) =>
       }
       resolve(crypto.timingSafeEqual(hashedPassword, hash));
     });
-  });}
+  });
+};
 
 module.exports = {
-    hashPassword,
-    comparePasswords,
-  }
+  hashPassword,
+  comparePasswords,
+};

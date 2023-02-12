@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const userPetSchema = new mongoose.Schema({
-  // _id: Number,
   imgURL: {
     url: {
       type: String,

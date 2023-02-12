@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-//const { getNewID } = require('../Helpers/newID.js');
 const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
 
 const { adSchema } = require('./schema.js');
@@ -63,7 +62,6 @@ async function getAdById(req, res) {
 }
 
 async function addAd(req, res) {
-  //const _id = await getNewID(Ad);
   const props = req.body;
 
   const userId = req.user.id;
@@ -73,10 +71,8 @@ async function addAd(req, res) {
   if (req.file) {
     const result = await uploadCLD(req.file.path);
     imgURL = { url: result.url, publicId: result.public_id };
-    //console.log('upload   result   ', result);
   }
   const newAd = new Ad({ ...props, userId, owner, imgURL });
-  //console.log('NEWS AD', newAd);
   newAd.save(async (err, ad) => {
     if (err) {
       res.status(400).json({ message: 'Error occurred', err: err });

@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-// const { getNewID } = require('../Helpers/newID.js');
 const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
 const fs = require('fs/promises');
 
@@ -23,7 +22,6 @@ async function getUserPets(req, res) {
 }
 
 async function addUserPet(req, res) {
-  //const _id = await getNewID(UserPet);
   const userId = req.user.id;
   const pet = req.body;
   let imgURL = { url: '', publicId: '' };
@@ -65,10 +63,8 @@ async function updateUserPet(req, res) {
   const _id = req.params.id;
   const userId = req.user.id;
   const prop = { ...req.body };
-  console.log('_id, userId ', _id, userId);
 
   let pet = await UserPet.findOne({ _id, userId });
-  console.log('pet ', pet);
   if (!pet) {
     res.status(400).json({ message: 'No found pet' });
     return;

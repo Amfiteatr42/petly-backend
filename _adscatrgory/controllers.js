@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 
 const { categorySchema } = require('./schema.js');
 const Category = mongoose.model('AdsCategory', categorySchema);
-//const { getNewID } = require ("../Helpers/newID");
 
 async function getAllCategory(req, res) {
   await Category.find().exec((err, categories) => {
@@ -22,7 +21,6 @@ async function addCategory(req, res) {
   if (!nameCategory) {
     res.status(400).json({ message: 'Bad request' });
   }
-  //const _id = await getNewID(Category);
 
   const newCategory = new Category({ nameCategory });
   newCategory.save(async (err, category) => {

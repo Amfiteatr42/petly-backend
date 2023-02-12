@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-//const { getNewID } = require('../Helpers/newID.js');
 
 const { friendSchema } = require('./schema.js');
 const Friends = mongoose.model('Friends', friendSchema);
@@ -18,7 +17,6 @@ async function getFriends(req, res) {
 }
 
 async function addFriends(req, res) {
-  // const _id = await getNewID(Friends);
   const friendInfo = req.body;
   const newFriend = new Friends({ ...friendInfo });
 

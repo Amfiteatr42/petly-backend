@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-// const { getNewID } = require('../Helpers/newID.js');
 
 const { newSchema } = require('./schema.js');
 const News = mongoose.model('News', newSchema);
@@ -18,7 +17,6 @@ async function getNews(req, res) {
 }
 
 async function addNews(req, res) {
-  // const _id = await getNewID(News);
   const news = req.body;
   const newNews = new News({ ...news });
 

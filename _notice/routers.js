@@ -1,27 +1,27 @@
-const express = require("express");
-const adsControl = require("./controllers.js");
-const { checkUser } = require("../middleware/usermiddleware.js");
-const upload = require("../Helpers/multer.js");
+const express = require('express');
+const adsControl = require('./controllers.js');
+const { checkUser } = require('../middleware/usermiddleware.js');
+const upload = require('../Helpers/multer.js');
 
 const router = express.Router();
 
-router.get("/", adsControl.getAllAds); //
+router.get('/', adsControl.getAllAds);
 
-router.get("/my", checkUser, adsControl.getMyAds); //
+router.get('/my', checkUser, adsControl.getMyAds);
 
-router.get("/ad/:id", checkUser, adsControl.getAdById); //
+router.get('/ad/:id', checkUser, adsControl.getAdById);
 
-router.post("/add", checkUser, upload.single("petImg"), adsControl.addAd); //
+router.post('/add', checkUser, upload.single('petImg'), adsControl.addAd);
 
-router.delete("/remove/:id", checkUser, adsControl.removeAd); //
+router.delete('/remove/:id', checkUser, adsControl.removeAd);
 
 router.patch(
-  "/update/:id",
+  '/update/:id',
   checkUser,
-  upload.single("petImg"),
+  upload.single('petImg'),
   adsControl.updateAd
-); //
+);
 
-router.get("/search/:str", adsControl.searchAds); // 
+router.get('/search/:str', adsControl.searchAds);
 
 module.exports = router;

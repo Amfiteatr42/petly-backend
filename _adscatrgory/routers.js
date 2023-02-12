@@ -1,16 +1,13 @@
-const express = require("express");
-const categoryControl = require("./controllers.js");
-const { checkUser } = require("../middleware/usermiddleware.js");
+const express = require('express');
+const categoryControl = require('./controllers.js');
+const { checkUser } = require('../middleware/usermiddleware.js');
 
 const router = express.Router();
 
-router.get("/", categoryControl.getAllCategory); // 
+router.get('/', categoryControl.getAllCategory);
 
-router.post("/add", checkUser, categoryControl.addCategory); // 
+router.post('/add', checkUser, categoryControl.addCategory);
 
-router.patch("/update/:id", checkUser, categoryControl.updateCategory); //
+router.patch('/update/:id', checkUser, categoryControl.updateCategory);
 
 module.exports = router;
-
-
-

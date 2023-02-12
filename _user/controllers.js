@@ -7,7 +7,6 @@ const User = mongoose.model('User', userSchema);
 const { hashPassword, comparePasswords } = require('../Helpers/password.js');
 const { generateToken } = require('../Helpers/token.js');
 
-// const { getNewID } = require('../Helpers/newID.js');
 const { uploadCLD, removeCLD } = require('../Helpers/cloudinary.js');
 const { validateDate } = require('../Helpers/validateDate.js');
 
@@ -39,46 +38,13 @@ function makeValidate(req, res) {
   return true;
 }
 
-// function validatePassword(req, res) {
-//   const schema = Joi.object({
-//     password: Joi.string()
-//       .pattern(/^[ а-яА-Яa-zA-Z0-9]+$/)
-//       .min(7)
-//       .max(32)
-//       .required(),
-//   });
-//   const validate = schema.validate(req.body.password);
-//   if (validate.error) {
-//     res.status(400).send(
-//       JSON.stringify({
-//         message: `validate failed with error ${validate.error}`,
-//       })
-//     );
-//     return false;
-//   }
-//   return true;
-// }
-
 async function userRegistration(req, res) {
   if (!makeValidate(req, res)) return;
-  // if (!validatePassword(req, res)) return;
   const { email, password, userName, city, phone } = req.body;
-  //console.log(email, password, userName, city, phone);
 
   const newUser = new User({});
   newUser.password = await hashPassword(password);
-  // newUser._id = await getNewID(User);
   newUser.email = email;
-  // if (validateDate(birthday)) {
-  //   newUser.birthday = validateDate(birthday);
-  // } else {
-  //   res.status(400).send(
-  //     JSON.stringify({
-  //       message: `validate failed with error: Validate birthday failed`,
-  //     })
-  //   );
-  //   return false;
-  // }
   newUser.userName = userName;
   newUser.city = city;
   newUser.phone = phone;
@@ -86,22 +52,6 @@ async function userRegistration(req, res) {
     .toString()
     .padStart(4, '0');
   newUser.verificationEmailToken = verificationEmailToken;
-
-  // sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-  // const msg = {
-  //     to: newUser.email,
-  //     from: 'selutin.odessa@meta.ua',
-  //     subject: `Confirm your e-mail`,
-  //     text: `Your sicret code: ${newUser.verificationToken}`,
-  // }
-  // await sgMail.send(msg)
-  //     .then(() => {
-  //         console.log ("post sended ", newUser.email)
-  //     })
-  //     .catch(err => {
-  //         res.status(400).json({ "message": "Error occurred", "err": err });
-  //         return;
-  //     });
 
   newUser.save(async (err, data) => {
     if (err) {
@@ -233,7 +183,6 @@ async function getInfoCurrentUser(req, res) {
 }
 
 async function updateUser(req, res) {
-  //if (!makeValidate(req, res)) return;
   const id = req.user.id;
   const prop = req.body;
   const { birthday } = req.body;
@@ -355,8 +304,6 @@ async function refreshUser(req, res) {
     res.status(400).json({ message: `Not authorised` });
     return;
   }
-  //console.log('longToken    ===> ', longToken);
-  //console.log('user.longToken    ===> ', user.longToken);
 
   if (user.longToken !== longToken) {
     user.longToken = '';
