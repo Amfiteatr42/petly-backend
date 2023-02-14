@@ -410,7 +410,8 @@ async function removeFavoriteAds(req, res) {
   const user = await User.findById(_id).select(
     '-password -longToken -verifyEmail -verificationEmailToken -__v'
   );
-  user.favoriteAds.splice(user.favoriteAds.indexOf(adId), 1);
+
+  user.favoriteAds = user.favoriteAds.filter(favId => favId !== adId);
   user.save(async (err, user) => {
     if (err) {
       res.status(500).json({ message: 'Error occurred', err: err });

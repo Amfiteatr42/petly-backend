@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'City is required'],
   },
   phone: String,
-  favoriteAds: [mongoose.SchemaTypes.ObjectId],
+  favoriteAds: [String],
   birthday: Date,
   longToken: {
     type: String,
